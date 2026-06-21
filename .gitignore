@@ -1,0 +1,21 @@
+# Documentos PDF e Excel (referência apenas)
+*.pdf
+*.xlsx
+*.docx
+*.zip
+*.smmx
+*.txt
+
+# Pastas do sistema
+.claude/
+.DS_Store
+Thumbs.db
+
+# Node/npm (se usar futuramente)
+node_modules/
+npm-debug.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
