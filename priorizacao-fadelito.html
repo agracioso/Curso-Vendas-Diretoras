@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Priorização - Trilha de Venda Consultiva Fadelito</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .scenarios {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 0.9em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .hours-gauge {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .gauge-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .gauge-label {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .gauge-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .status-ok {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-card h3 {
+            font-size: 0.9em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .chart-canvas {
+            position: relative;
+            height: 280px;
+        }
+
+        .scenarios-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenarios-title {
+            font-size: 0.9em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .scenarios {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .scenario-btn {
+            padding: 14px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-align: center;
+        }
+
+        .scenario-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .scenario-btn.select-all {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .scenario-btn.select-all:hover {
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .modules-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .module {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .module:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .module.selected {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .module-checkbox {
+            width: 24px;
+            height: 24px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .module-info {
+            flex: 1;
+        }
+
+        .module-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 4px;
+        }
+
+        .module-layer {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .layer-core {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .layer-protocol {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .layer-onboarding {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .layer-extra {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .module-priority {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .priority-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .priority-1 {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .priority-2 {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .priority-3 {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .module-hours {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1em;
+            margin: 8px 0;
+        }
+
+        .module-details {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+
+        .module-prerequisites {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .prerequisite-missing {
+            color: #d9534f;
+            font-weight: 500;
+        }
+
+        .prerequisite-met {
+            color: #5cb85c;
+            font-weight: 500;
+        }
+
+        .impact-matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .impact-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .impact-card h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .impact-list {
+            list-style: none;
+        }
+
+        .impact-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        .impact-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: #5cb85c;
+        }
+
+        .impact-card.risks li:before {
+            content: "⚠";
+            color: #f0ad4e;
+        }
+
+        .impact-card.risks {
+            border: 2px solid #f0ad4e;
+        }
+
+        .export-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .impact-matrix {
+                grid-template-columns: 1fr;
+            }
+
+            .modules-container {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Matriz de Priorização</h1>
+            <p class="subtitle">Trilha de Venda Consultiva Fadelito</p>
+            <p style="color: #999; margin-top: 10px; font-size: 0.95em;">Selecione os módulos que melhor atendem sua necessidade. A priorização e as horas correspondentes à sua escolha se atualizam em tempo real.</p>
+        </header>
+
+        <!-- Cenários Rápidos (topo horizontal) -->
+        <div class="scenarios-section">
+            <div class="scenarios-title">Selecione um Cenário ou Customize a Seleção</div>
+            <div class="scenarios" id="scenariosContainer"></div>
+        </div>
+
+        <!-- Dashboard (2 colunas) -->
+        <div class="dashboard">
+            <!-- Resumo de Horas -->
+            <div class="card">
+                <div class="card-title">Total de Horas Selecionadas</div>
+                <div class="hours-gauge">
+                    <div class="gauge-value"><span id="selectedHours">0</span>h</div>
+                    <div id="statusGauge" class="gauge-status status-ok">✓ Flexível conforme seleção</div>
+                </div>
+            </div>
+
+            <!-- Resumo de Módulos -->
+            <div class="card">
+                <div class="card-title">Resumo de Seleção</div>
+                <div style="font-size: 2.5em; font-weight: bold; color: #667eea; margin: 20px 0;" id="moduleCount">0</div>
+                <div style="color: #999; margin-bottom: 15px;"><span id="moduleText">nenhum módulo</span> selecionado</div>
+                <div style="font-size: 0.9em; color: #555; line-height: 1.8;">
+                    <div><strong id="essentialCount">0</strong> Essenciais (faltam <strong id="essentialMissing">5</strong>)</div>
+                    <div><strong id="importantCount">0</strong> Importantes</div>
+                    <div><strong id="desirableCount">0</strong> Desejáveis</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos de Análise -->
+        <div class="charts-grid" id="chartsSection" style="display: none;">
+            <div class="chart-card">
+                <h3>Composição por Cenário</h3>
+                <div class="chart-canvas">
+                    <canvas id="scenarioChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Distribuição por Tema</h3>
+                <div class="chart-canvas">
+                    <canvas id="themeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matriz de Impacto -->
+        <div class="impact-matrix">
+            <div class="impact-card benefits">
+                <h3>✅ Vantagens da Seleção</h3>
+                <ul class="impact-list" id="benefitsContainer">
+                    <li>Selecione módulos para ver análise de impacto</li>
+                </ul>
+            </div>
+            <div class="impact-card risks">
+                <h3>⚠️ Lacunas e Riscos</h3>
+                <ul class="impact-list" id="risksContainer">
+                    <li>Nenhuma seleção ainda</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Módulos -->
+        <div style="margin-bottom: 30px;">
+            <h2 style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; color: #333;">Selecione os Módulos</h2>
+            <div class="modules-container" id="modulesContainer"></div>
+        </div>
+
+        <!-- Exportar -->
+        <div class="export-section">
+            <h2 style="margin-bottom: 15px; color: #333;">💾 Exportar Seleção</h2>
+            <button class="btn btn-primary" onclick="exportSelection()">📋 Copiar JSON para Compartilhar</button>
+            <button class="btn btn-secondary" onclick="exportAsText()">📄 Baixar Resumo em Texto</button>
+            <div id="copyMessage"></div>
+        </div>
+
+        <div class="footer">
+            <p>Criado para facilitar a priorização conjunta com a Michele. Todos os dados ficam no seu navegador — nada é enviado para servidor.</p>
+        </div>
+    </div>
+
+    <script>
+        // Temas para agrupamento visual
+        const THEMES = {
+            foundation: { name: "Fundação", color: "#667eea", hex: "#667eea" },
+            value: { name: "Proposta de Valor", color: "#f093fb", hex: "#f093fb" },
+            relationship: { name: "Relacionamento", color: "#4facfe", hex: "#4facfe" },
+            objections: { name: "Objeções", color: "#fa709a", hex: "#fa709a" },
+            practice: { name: "Prática", color: "#30cfd0", hex: "#30cfd0" },
+            commercial: { name: "Gestão Comercial", color: "#a8edea", hex: "#a8edea" },
+            culture: { name: "Cultura", color: "#fed6e3", hex: "#fed6e3" },
+            personal: { name: "Desenvolvimento Pessoal", color: "#ffecd2", hex: "#ffecd2" }
+        };
+
+        // Dados dos módulos
+        const modules = [
+            {
+                id: 1,
+                title: "Fundamentos da Venda Consultiva",
+                layer: "A — Núcleo",
+                layerClass: "core",
+                hours: 1.5,
+                priority: 1,
+                theme: "foundation",
+                justification: "Citado pela Michele: 'desmistificasse da cabeça dela que vender é uma coisa ruim'",
+                prerequisites: [],
+                observations: "Módulo de abertura — referência de ancoragem para os demais"
+            },
+            {
+                id: 2,
+                title: "Diferenciais Institucionais como Argumento de Valor",
+                layer: "A — Núcleo",
+                layerClass: "core",
+                hours: 1.5,
+                priority: 1,
+                theme: "value",
+                justification: "Gap de valor identificado no Relatório Fonte 101",
+                prerequisites: [1],
+                observations: "Inclui estudo de caso da fratura em outra escola"
+            },
+            {
+                id: 3,
+                title: "Qualificação e Leitura de Perfil Familiar",
+                layer: "A — Núcleo",
+                layerClass: "core",
+                hours: 2,
+                priority: 1,
+                theme: "relationship",
+                justification: "Exemplo berçário vs. pré dado pela Michele",
+                prerequisites: [1],
+                observations: "Inclui introdução a Rapport/PNL aplicados"
+            },
+            {
+                id: 4,
+                title: "Top 5 Objeções e Decisão Multi-Decisor",
+                layer: "A — Núcleo",
+                layerClass: "core",
+                hours: 2.5,
+                priority: 1,
+                theme: "objections",
+                justification: "Pedido explícito da Michele",
+                prerequisites: [2, 3],
+                observations: "Inclui técnica de inserção na conversa do casal"
+            },
+            {
+                id: 5,
+                title: "Protocolo de Pós-Venda e Follow-up",
+                layer: "A — Núcleo",
+                layerClass: "core",
+                hours: 1.5,
+                priority: 2,
+                theme: "relationship",
+                justification: "Risco de 'esquecimento' se omitido",
+                prerequisites: [2, 3, 4],
+                observations: "Famílias visitam 6-7 escolas antes de decidir"
+            },
+            {
+                id: 6,
+                title: "Roleplay com IA + Diário Reflexivo",
+                layer: "A — Núcleo",
+                layerClass: "core",
+                hours: 3,
+                priority: 1,
+                theme: "practice",
+                justification: "Pedido explícito do Edgar e da Michele",
+                prerequisites: [1, 2, 3, 4],
+                observations: "Módulo de fechamento — consolidação prática"
+            },
+            {
+                id: 7,
+                title: "Gatilhos Mentais",
+                layer: "A — Núcleo",
+                layerClass: "core",
+                hours: 1,
+                priority: 2,
+                theme: "objections",
+                justification: "Citado pela Michele como assunto que quer incluir",
+                prerequisites: [1],
+                observations: "Pode ser absorvido dentro de 'Top 5 Objeções'"
+            },
+            {
+                id: 8,
+                title: "PNL e Rapport",
+                layer: "A — Núcleo",
+                layerClass: "core",
+                hours: 1.5,
+                priority: 2,
+                theme: "relationship",
+                justification: "Listado no Relatório Fonte 101",
+                prerequisites: [3],
+                observations: "Avaliar se cabe como extensão do módulo de Qualificação"
+            },
+            {
+                id: 9,
+                title: "Leitura de KPIs Comerciais da Unidade",
+                layer: "B — Protocolo de Virada",
+                layerClass: "protocol",
+                hours: 2,
+                priority: 3,
+                theme: "commercial",
+                justification: "Mencionado pela Michele como parte da jornada de crise",
+                prerequisites: [1, 2, 3, 4],
+                observations: "Recomendado como produto separado"
+            },
+            {
+                id: 10,
+                title: "Mapeamento de Concorrência Local",
+                layer: "B — Protocolo de Virada",
+                layerClass: "protocol",
+                hours: 1.5,
+                priority: 3,
+                theme: "commercial",
+                justification: "'Lição de casa' citada pela Michele",
+                prerequisites: [9],
+                observations: "Recomendado como produto separado"
+            },
+            {
+                id: 11,
+                title: "Imersão Cultural para Novas Lideranças/Franquias",
+                layer: "C — Onboarding",
+                layerClass: "onboarding",
+                hours: 2,
+                priority: 3,
+                theme: "culture",
+                justification: "Sugestão do Edgar na reunião",
+                prerequisites: [],
+                observations: "Reaproveita conteúdo de A — custo incremental baixo"
+            },
+            {
+                id: 12,
+                title: "Gestão Emocional / Resiliência Comercial",
+                layer: "Extra",
+                layerClass: "extra",
+                hours: 1,
+                priority: 3,
+                theme: "personal",
+                justification: "Lacuna identificada por nós",
+                prerequisites: [],
+                observations: "Inclusão opcional — validar apetite antes de propor"
+            }
+        ];
+
+        const scenarios = [
+            { name: "Mínimo", modules: [1, 2, 4, 6], hours: 8.5, level: 1 },
+            { name: "Recomendado", modules: [1, 2, 3, 4, 6], hours: 10.5, level: 2 },
+            { name: "Robusto", modules: [1, 2, 3, 4, 5, 6], hours: 12, level: 3 },
+            { name: "Completo A", modules: [1, 2, 3, 4, 5, 6, 7, 8], hours: 15, level: 4 },
+            { name: "Visão estratégica", modules: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], hours: 18.5, level: 5 },
+            { name: "Expansão em bases sólidas", modules: [1, 2, 3, 4, 5, 6, 7, 8, 11], hours: 17, level: 6 },
+            { name: "Autorregulação", modules: [1, 2, 3, 4, 5, 6, 7, 8, 12], hours: 16, level: 7 }
+        ];
+
+        let selected = new Set();
+        let scenarioCharts = { scenario: null, theme: null };
+
+        // Inicializar
+        function init() {
+            renderModules();
+            renderScenarios();
+            updateMetrics();
+        }
+
+        function getThemeColor(themeKey) {
+            return THEMES[themeKey]?.color || '#999';
+        }
+
+        function getModuleThemeClass(themeKey) {
+            const themeColorMap = {
+                foundation: "#667eea",
+                value: "#f093fb",
+                relationship: "#4facfe",
+                objections: "#fa709a",
+                practice: "#30cfd0",
+                commercial: "#a8edea",
+                culture: "#fed6e3",
+                personal: "#ffecd2"
+            };
+            return themeColorMap[themeKey] || "#999";
+        }
+
+        function renderModules() {
+            const container = document.getElementById('modulesContainer');
+            container.innerHTML = modules.map(m => {
+                const themeColor = getModuleThemeClass(m.theme);
+                return `
+                    <div class="module ${selected.has(m.id) ? 'selected' : ''}"
+                         style="border-left: 4px solid ${themeColor};"
+                         onclick="toggleModule(${m.id})">
+                        <div class="module-header">
+                            <input type="checkbox" class="module-checkbox" ${selected.has(m.id) ? 'checked' : ''}
+                                   onchange="event.stopPropagation(); toggleModule(${m.id})">
+                            <div class="module-info">
+                                <div class="module-title">${m.title}</div>
+                                <span class="module-layer layer-${m.layerClass}">${m.layer}</span>
+                                <div class="module-priority">
+                                    <span class="priority-badge priority-${m.priority}">
+                                        ${m.priority === 1 ? '⭐ Essencial' : m.priority === 2 ? '⚠️ Importante' : '💡 Desejável'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="module-hours">${m.hours}h</div>
+                        <div class="module-details">${m.justification}</div>
+                        ${m.prerequisites.length > 0 ? `
+                            <div class="module-prerequisites">
+                                <strong>Pré-requisitos:</strong>
+                                ${m.prerequisites.map(pId => {
+                                    const pModule = modules.find(x => x.id === pId);
+                                    const isMet = selected.has(pId);
+                                    return `<div class="${isMet ? 'prerequisite-met' : 'prerequisite-missing'}">
+                                        ${isMet ? '✓' : '✗'} ${pModule.title}
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        ` : ''}
+                        ${m.observations ? `<div style="font-size: 0.85em; color: #999; margin-top: 10px; font-style: italic;">📝 ${m.observations}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderScenarios() {
+            const container = document.getElementById('scenariosContainer');
+            const totalModules = modules.length;
+            const totalHours = modules.reduce((sum, m) => sum + m.hours, 0);
+
+            let html = `<button class="scenario-btn select-all" onclick="loadAllModules()">
+                <div>🎯 Todos</div>
+                <div style="font-size: 0.75em; margin-top: 4px;">${totalModules} módulos | ${totalHours.toFixed(1)}h</div>
+            </button>`;
+
+            html += scenarios.map((s, i) => `
+                <button class="scenario-btn" onclick="loadScenario(${i})">
+                    <div>${s.name}</div>
+                    <div style="font-size: 0.75em; margin-top: 4px;">${s.modules.length} módulos | ${s.hours}h</div>
+                </button>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        function toggleModule(id) {
+            if (selected.has(id)) {
+                selected.delete(id);
+            } else {
+                selected.add(id);
+            }
+            renderModules();
+            updateMetrics();
+        }
+
+        function loadScenario(scenarioIndex) {
+            selected = new Set(scenarios[scenarioIndex].modules);
+            renderModules();
+            updateMetrics();
+        }
+
+        function loadAllModules() {
+            selected = new Set(modules.map(m => m.id));
+            renderModules();
+            updateMetrics();
+        }
+
+        function updateMetrics() {
+            const selectedModules = modules.filter(m => selected.has(m.id));
+            const totalHours = selectedModules.reduce((sum, m) => sum + m.hours, 0);
+            const essentialSelected = selectedModules.filter(m => m.priority === 1).length;
+            const essentialTotal = modules.filter(m => m.priority === 1).length;
+            const importantSelected = selectedModules.filter(m => m.priority === 2).length;
+            const desirableSelected = selectedModules.filter(m => m.priority === 3).length;
+
+            // Atualizar valores
+            document.getElementById('selectedHours').textContent = totalHours.toFixed(1);
+            document.getElementById('moduleCount').textContent = selectedModules.length;
+            document.getElementById('moduleText').textContent = selectedModules.length === 0 ? 'nenhum módulo' : `${selectedModules.length} módulo${selectedModules.length > 1 ? 's' : ''}`;
+            document.getElementById('essentialCount').textContent = essentialSelected;
+            document.getElementById('essentialMissing').textContent = essentialTotal - essentialSelected;
+            document.getElementById('importantCount').textContent = importantSelected;
+            document.getElementById('desirableCount').textContent = desirableSelected;
+
+            // Status
+            const statusEl = document.getElementById('statusGauge');
+            statusEl.className = `gauge-status status-ok`;
+            statusEl.textContent = selectedModules.length > 0 ?
+                `✓ ${selectedModules.length} módulo${selectedModules.length > 1 ? 's' : ''} selecionado${selectedModules.length > 1 ? 's' : ''}` :
+                `Nenhum módulo selecionado`;
+
+            // Mostrar/esconder seção de gráficos
+            if (selectedModules.length > 0) {
+                document.getElementById('chartsSection').style.display = 'grid';
+                updateCharts(selectedModules);
+            } else {
+                document.getElementById('chartsSection').style.display = 'none';
+            }
+
+            // Análise de impacto
+            updateImpactAnalysis(selectedModules);
+        }
+
+        function updateCharts(selectedModules) {
+            updateScenarioChart(selectedModules);
+            updateThemeChart(selectedModules);
+        }
+
+        function updateScenarioChart(selectedModules) {
+            const ctx = document.getElementById('scenarioChart');
+            if (!ctx) return;
+
+            const context = ctx.getContext('2d');
+
+            if (scenarioCharts.scenario) {
+                scenarioCharts.scenario.destroy();
+            }
+
+            // Calcular quais cenários foram atingidos
+            const scenarioData = [];
+            let previousTotal = 0;
+
+            // Sempre começar com o Mínimo
+            const minModules = scenarios[0].modules;
+            const minHours = modules.filter(m => minModules.includes(m.id)).reduce((sum, m) => sum + m.hours, 0);
+
+            const totalHours = selectedModules.reduce((sum, m) => sum + m.hours, 0);
+
+            let labels = ["Mínimo"];
+            let data = [minHours];
+            let colors = ["#667eea"];
+
+            // Verificar se passou do Mínimo
+            if (totalHours > minHours) {
+                const additional = totalHours - minHours;
+                labels.push("Adicional");
+                data.push(additional);
+                colors.push("#ffeaa7");
+            }
+
+            scenarioCharts.scenario = new Chart(context, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: ['white', 'white', 'white'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed.toFixed(1) + 'h';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateThemeChart(selectedModules) {
+            const ctx = document.getElementById('themeChart');
+            if (!ctx) return;
+
+            const context = ctx.getContext('2d');
+
+            if (scenarioCharts.theme) {
+                scenarioCharts.theme.destroy();
+            }
+
+            // Agrupar por tema
+            const themeData = {};
+            const themeColors = {};
+
+            Object.keys(THEMES).forEach(key => {
+                themeData[key] = 0;
+                themeColors[key] = THEMES[key].color;
+            });
+
+            selectedModules.forEach(m => {
+                if (!themeData.hasOwnProperty(m.theme)) {
+                    themeData[m.theme] = 0;
+                }
+                themeData[m.theme] += m.hours;
+            });
+
+            // Filtrar apenas temas com horas
+            const activeThemes = Object.keys(themeData).filter(k => themeData[k] > 0);
+            const labels = activeThemes.map(k => THEMES[k].name);
+            const data = activeThemes.map(k => themeData[k]);
+            const colors = activeThemes.map(k => themeColors[k]);
+
+            scenarioCharts.theme = new Chart(context, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: ['white', 'white', 'white', 'white', 'white', 'white', 'white', 'white'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed.toFixed(1) + 'h';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateImpactAnalysis(selectedModules) {
+            const benefits = document.getElementById('benefitsContainer');
+            const risks = document.getElementById('risksContainer');
+
+            const benefitsList = [];
+            const risksList = [];
+            const totalModules = modules.length;
+
+            if (selectedModules.length === 0) {
+                benefitsList.push("Selecione módulos para ver análise de impacto");
+                risksList.push("Nenhuma seleção ainda");
+            } else {
+                // BENEFÍCIOS
+                const essentialSelected = selectedModules.filter(m => m.priority === 1).length;
+                const essentialTotal = modules.filter(m => m.priority === 1).length;
+
+                benefitsList.push(`Cobre ${essentialSelected}/${essentialTotal} módulos essenciais`);
+
+                if (selectedModules.some(m => m.id === 1)) {
+                    benefitsList.push("Inclui fundamentos como âncora para demais módulos");
+                }
+                if (selectedModules.some(m => m.id === 6)) {
+                    benefitsList.push("Prática aplicada com roleplay garante consolidação");
+                }
+
+                // Verificar pré-requisitos
+                const unmetPrereqs = selectedModules.filter(m =>
+                    m.prerequisites.some(p => !selected.has(p))
+                );
+                if (unmetPrereqs.length === 0) {
+                    benefitsList.push("Todos os pré-requisitos foram cumpridos");
+                }
+
+                // RISCOS E LACUNAS
+                const importantSelected = selectedModules.filter(m => m.priority === 2).length;
+                const desirableSelected = selectedModules.filter(m => m.priority === 3).length;
+
+                const importantTotal = modules.filter(m => m.priority === 2).length;
+                const desirableTotal = modules.filter(m => m.priority === 3).length;
+
+                const essentialMissing = essentialTotal - essentialSelected;
+                const importantMissing = importantTotal - importantSelected;
+                const desirableMissing = desirableTotal - desirableSelected;
+                const totalMissing = totalModules - selectedModules.length;
+
+                if (totalMissing > 0) {
+                    risksList.push(`Faltam ${totalMissing} de ${totalModules} módulos disponíveis`);
+                }
+
+                if (essentialMissing > 0) {
+                    risksList.push(`⭐ Faltam ${essentialMissing} módulo${essentialMissing > 1 ? 's' : ''} essencial${essentialMissing > 1 ? 'is' : ''} (${essentialSelected}/${essentialTotal})`);
+                }
+
+                if (importantMissing > 0) {
+                    risksList.push(`⚠️ Faltam ${importantMissing} módulo${importantMissing > 1 ? 's' : ''} importante${importantMissing > 1 ? 's' : ''} (${importantSelected}/${importantTotal})`);
+                }
+
+                if (desirableMissing > 0) {
+                    risksList.push(`💡 Não incluídos ${desirableMissing} módulo${desirableMissing > 1 ? 's' : ''} desejável${desirableMissing > 1 ? 'is' : ''} (${desirableSelected}/${desirableTotal})`);
+                }
+
+                // Pré-requisitos não atendidos
+                if (unmetPrereqs.length > 0) {
+                    risksList.push(`⚠️ ${unmetPrereqs.length} módulo${unmetPrereqs.length > 1 ? 's' : ''} tem pré-requisitos não incluídos`);
+                }
+            }
+
+            benefits.innerHTML = benefitsList.length > 0 ?
+                benefitsList.map(b => `<li>${b}</li>`).join('') :
+                '<li>Nenhum benefício ainda</li>';
+
+            risks.innerHTML = risksList.length > 0 ?
+                risksList.map(r => `<li>${r}</li>`).join('') :
+                '<li>Sem riscos identificados</li>';
+        }
+
+        function exportSelection() {
+            const selectedModules = modules.filter(m => selected.has(m.id));
+            const totalHours = selectedModules.reduce((sum, m) => sum + m.hours, 0);
+
+            const data = {
+                timestamp: new Date().toISOString(),
+                totalHours: totalHours,
+                withinBudget: totalHours <= 15,
+                selectedModules: selectedModules.map(m => ({
+                    id: m.id,
+                    title: m.title,
+                    layer: m.layer,
+                    hours: m.hours,
+                    priority: m.priority
+                }))
+            };
+
+            const json = JSON.stringify(data, null, 2);
+            navigator.clipboard.writeText(json).then(() => {
+                const msg = document.getElementById('copyMessage');
+                msg.innerHTML = '<div class="message success">✓ Seleção copiada! Cole em um editor de texto ou compartilhe.</div>';
+                setTimeout(() => msg.innerHTML = '', 3000);
+            });
+        }
+
+        function exportAsText() {
+            const selectedModules = modules.filter(m => selected.has(m.id));
+            const totalHours = selectedModules.reduce((sum, m) => sum + m.hours, 0);
+
+            let text = "PRIORIZAÇÃO — TRILHA DE VENDA CONSULTIVA FADELITO\n";
+            text += "=" + "=".repeat(70) + "\n\n";
+            text += `Data: ${new Date().toLocaleString('pt-BR')}\n`;
+            text += `Total de Horas: ${totalHours.toFixed(1)} de 15h\n`;
+            text += `Status: ${totalHours <= 15 ? 'Dentro do teto ✓' : `Estoura em ${(totalHours - 15).toFixed(1)}h ⚠`}\n\n`;
+
+            text += "MÓDULOS SELECIONADOS:\n";
+            text += "-" + "-".repeat(70) + "\n";
+            selectedModules.forEach(m => {
+                text += `\n${m.title}\n`;
+                text += `  Camada: ${m.layer} | Horas: ${m.hours}h | Prioridade: ${m.priority}\n`;
+            });
+
+            text += "\n" + "=".repeat(72) + "\n";
+            text += "Compartilhe este resumo com a Michele para discussão em call.\n";
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `priorizacao-fadelito-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+        }
+
+        // Iniciar
+        init();
+    </script>
+</body>
+</html>
