@@ -1123,8 +1123,6 @@
                 text += `  Camada: ${m.layer} | Horas: ${m.hours}h | Prioridade: ${m.priority}\n`;
             });
 
-            text += "\n" + "=".repeat(72) + "\n";
-            text += "Compartilhe este resumo com a Michele para discussão em call.\n";
 
             const blob = new Blob([text], { type: 'text/plain' });
             const url = window.URL.createObjectURL(blob);
