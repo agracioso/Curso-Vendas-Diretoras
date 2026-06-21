@@ -190,15 +190,15 @@
             transform: translateY(-1px);
         }
 
-        .scenario-btn.select-all {
+        .scenario-btn.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-color: transparent;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .scenario-btn.select-all:hover {
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-            color: white;
+        .scenario-btn.active:hover {
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
 
         .modules-container {
@@ -797,9 +797,10 @@
             const container = document.getElementById('scenariosContainer');
             const totalModules = modules.length;
             const totalHours = modules.reduce((sum, m) => sum + m.hours, 0);
+            const isAllSelected = selected.size === totalModules;
 
-            let html = `<button class="scenario-btn select-all" onclick="loadAllModules()">
-                <div>🎯 Todos</div>
+            let html = `<button class="scenario-btn ${isAllSelected ? 'active' : ''}" onclick="loadAllModules()">
+                <div>${isAllSelected ? '🎯' : ''} Todos</div>
                 <div style="font-size: 0.75em; margin-top: 4px;">${totalModules} módulos | ${totalHours.toFixed(1)}h</div>
             </button>`;
 
@@ -820,18 +821,21 @@
                 selected.add(id);
             }
             renderModules();
+            renderScenarios();
             updateMetrics();
         }
 
         function loadScenario(scenarioIndex) {
             selected = new Set(scenarios[scenarioIndex].modules);
             renderModules();
+            renderScenarios();
             updateMetrics();
         }
 
         function loadAllModules() {
             selected = new Set(modules.map(m => m.id));
             renderModules();
+            renderScenarios();
             updateMetrics();
         }
 
