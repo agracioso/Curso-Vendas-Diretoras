@@ -726,6 +726,7 @@
 
         let selected = new Set();
         let scenarioCharts = { scenario: null, theme: null };
+        let activeScenarioIndex = null; // Rastreia qual cenário está ativo
 
         // Inicializar
         function init() {
@@ -804,12 +805,13 @@
                 <div style="font-size: 0.75em; margin-top: 4px;">${totalModules} módulos | ${totalHours.toFixed(1)}h</div>
             </button>`;
 
-            html += scenarios.map((s, i) => `
-                <button class="scenario-btn" onclick="loadScenario(${i})">
-                    <div>${s.name}</div>
+            html += scenarios.map((s, i) => {
+                const isActive = activeScenarioIndex === i && !isAllSelected;
+                return `<button class="scenario-btn ${isActive ? 'active' : ''}" onclick="loadScenario(${i})">
+                    <div>${isActive ? '🎯' : ''} ${s.name}</div>
                     <div style="font-size: 0.75em; margin-top: 4px;">${s.modules.length} módulos | ${s.hours}h</div>
-                </button>
-            `).join('');
+                </button>`;
+            }).join('');
 
             container.innerHTML = html;
         }
@@ -820,6 +822,7 @@
             } else {
                 selected.add(id);
             }
+            activeScenarioIndex = null; // Limpa o cenário ativo ao customizar
             renderModules();
             renderScenarios();
             updateMetrics();
@@ -827,6 +830,7 @@
 
         function loadScenario(scenarioIndex) {
             selected = new Set(scenarios[scenarioIndex].modules);
+            activeScenarioIndex = scenarioIndex;
             renderModules();
             renderScenarios();
             updateMetrics();
@@ -834,6 +838,7 @@
 
         function loadAllModules() {
             selected = new Set(modules.map(m => m.id));
+            activeScenarioIndex = null;
             renderModules();
             renderScenarios();
             updateMetrics();
