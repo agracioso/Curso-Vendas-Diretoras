@@ -31,6 +31,14 @@
             padding: 30px;
             margin-bottom: 30px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        header > div:last-child {
+            flex-shrink: 0;
         }
 
         h1 {
@@ -485,14 +493,19 @@
 <body>
     <div class="container">
         <header>
-            <div class="logo-ideasense">
-                <div style="font-size: 0.9em; color: #666;">
-                    Desenvolvido pela <strong style="color: #FF6600; font-size: 1.1em;">Ideasense</strong>
+            <div style="flex: 1;">
+                <div class="logo-ideasense">
+                    <div style="font-size: 0.9em; color: #666;">
+                        Desenvolvido pela <strong style="color: #FF6600; font-size: 1.1em;">Ideasense</strong>
+                    </div>
                 </div>
+                <h1>📊 Matriz de Priorização</h1>
+                <p class="subtitle">Trilha de Venda Consultiva Fadelito</p>
+                <p style="color: #999; margin-top: 10px; font-size: 0.95em;">Selecione os módulos que melhor atendem sua necessidade. A priorização e as horas correspondentes à sua escolha se atualizam em tempo real.</p>
             </div>
-            <h1>📊 Matriz de Priorização</h1>
-            <p class="subtitle">Trilha de Venda Consultiva Fadelito</p>
-            <p style="color: #999; margin-top: 10px; font-size: 0.95em;">Selecione os módulos que melhor atendem sua necessidade. A priorização e as horas correspondentes à sua escolha se atualizam em tempo real.</p>
+            <div style="flex-shrink: 0;">
+                <img src="img/Logo Ideasense (500 x 500 px) SEM bg.png" alt="Ideasense Logo" style="height: 120px; width: auto;">
+            </div>
         </header>
 
         <!-- Cenários Rápidos (topo horizontal) -->
